@@ -17,9 +17,9 @@ print("States: ", env.states())
 print("Successors: ", env.successors(state))
 
 print("\nTransitions and Rewards:")
-for action in env.actions:
+for a_idx, action_name in enumerate(env.actions):
     for succ in env.successors(state):
-        prob = env.p(succ, state, action)
+        prob = env.p(succ, state, a_idx)
         if prob > 0:
-            rew = env.reward(succ, state, action)
-            print(f"Action: {action:5} | Successor: {succ} | Prob: {prob} | Reward: {rew}")
+            rew = env.reward(succ, state, a_idx)
+            print(f"Action: {action_name:5} | Successor: {succ} | Prob: {prob} | Reward: {rew}")
