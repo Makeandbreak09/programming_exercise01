@@ -54,15 +54,20 @@ def epsilon_greedy(multiArmedBandit, n=10000, epsilon=0.1, time_varying=False, d
     optimal_percentage : list
     regret : list
     """
-
+    
     # Initialize metrics
     avg_rewards = []
     optimal_percentage = []
     regret = []
 
     # Initialize action value estimates and action counter
-    Q = np.zeros(multiArmedBandit.K)  # Initialize action value estimates
-    N = np.zeros(multiArmedBandit.K)  # Initialize action counter
+    Q = np.zeros(multiArmedBandit.K)  
+    N = np.zeros(multiArmedBandit.K)  
+
+    # Initialize variables for data accumulation
+    sum_reward = 0.0
+    optimal_count = 0
+    cumulative_regret = 0.0
 
     # UCB action selection
     for t in range(1, n + 1):
@@ -85,9 +90,16 @@ def epsilon_greedy(multiArmedBandit, n=10000, epsilon=0.1, time_varying=False, d
         Q[action] = Q[action] + (reward - Q[action]) / N[action]    # Update action value
 
         # Track metrics
-        avg_rewards.append(reward)
-        optimal_percentage.append(1 if action == multiArmedBandit.a_star else 0)
-        regret.append(multiArmedBandit.mu_star - reward)
+        sum_reward += reward
+        avg_rewards.append(sum_reward / t)
+
+        if action == multiArmedBandit.a_star:
+            optimal_count += 1
+        optimal_percentage.append(optimal_count / t)
+
+        # Cumulative regret
+        cumulative_regret += (multiArmedBandit.mu_star - multiArmedBandit.Mus[action])
+        regret.append(cumulative_regret)
 
     return avg_rewards, optimal_percentage, regret
 
@@ -118,7 +130,7 @@ def ucb(multiArmedBandit, n=10000, c=2):
     optimal_percentage : list
     regret : list
     """
-
+    
     # Initialize metrics
     avg_rewards = []
     optimal_percentage = []
@@ -127,6 +139,11 @@ def ucb(multiArmedBandit, n=10000, c=2):
     # Initialize action value estimates and action counter
     Q = np.zeros(multiArmedBandit.K)  # Initialize action value estimate
     N = np.zeros(multiArmedBandit.K)  # Initialize action counter
+
+    # Initialize variables for data accumulation
+    sum_reward = 0.0
+    optimal_count = 0
+    cumulative_regret = 0.0
 
     for t in range(1, n + 1):
         # UCB action, c > 0 controls exploration
@@ -142,8 +159,15 @@ def ucb(multiArmedBandit, n=10000, c=2):
         Q[action] = Q[action] + (reward - Q[action]) / N[action]    # Update action value
 
         # Track metrics
-        avg_rewards.append(reward)
-        optimal_percentage.append(1 if action == multiArmedBandit.a_star else 0)
-        regret.append(multiArmedBandit.mu_star - reward)
+        sum_reward += reward
+        avg_rewards.append(sum_reward / t)
+
+        if action == multiArmedBandit.a_star:
+            optimal_count += 1
+        optimal_percentage.append(optimal_count / t)
+
+        # Cumulative regret
+        cumulative_regret += (multiArmedBandit.mu_star - multiArmedBandit.Mus[action])
+        regret.append(cumulative_regret)
 
     return avg_rewards, optimal_percentage, regret
