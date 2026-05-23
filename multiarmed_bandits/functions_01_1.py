@@ -85,9 +85,9 @@ def epsilon_greedy(multiArmedBandit, n=10000, epsilon=0.1, time_varying=False, d
         Q[action] = Q[action] + (reward - Q[action]) / N[action]    # Update action value
 
         # Track metrics
-        avg_rewards.append(reward)
-        optimal_percentage.append(1 if action == multiArmedBandit.a_star else 0)
-        regret.append(multiArmedBandit.mu_star - reward)
+        avg_rewards.append(avg_rewards[-1] + (reward - avg_rewards[-1]) / t if avg_rewards else reward)  # Incremental average
+        optimal_percentage.append(optimal_percentage[-1] + (1-optimal_percentage[-1])/t if action == multiArmedBandit.a_star else optimal_percentage[-1]  + (0-optimal_percentage[-1])/t if optimal_percentage else 1 if action == multiArmedBandit.a_star else 0)
+        regret.append(regret[-1] + (multiArmedBandit.mu_star - multiArmedBandit.Mus[action]) if regret else (multiArmedBandit.mu_star - multiArmedBandit.Mus[action]))
 
     return avg_rewards, optimal_percentage, regret
 
@@ -142,8 +142,8 @@ def ucb(multiArmedBandit, n=10000, c=2):
         Q[action] = Q[action] + (reward - Q[action]) / N[action]    # Update action value
 
         # Track metrics
-        avg_rewards.append(reward)
-        optimal_percentage.append(1 if action == multiArmedBandit.a_star else 0)
-        regret.append(multiArmedBandit.mu_star - reward)
+        avg_rewards.append(avg_rewards[-1] + (reward - avg_rewards[-1]) / t if avg_rewards else reward)  # Incremental average
+        optimal_percentage.append(optimal_percentage[-1] + (1-optimal_percentage[-1])/t if action == multiArmedBandit.a_star else optimal_percentage[-1]  + (0-optimal_percentage[-1])/t if optimal_percentage else 1 if action == multiArmedBandit.a_star else 0)
+        regret.append(regret[-1] + (multiArmedBandit.mu_star - multiArmedBandit.Mus[action]) if regret else (multiArmedBandit.mu_star - multiArmedBandit.Mus[action]))
 
     return avg_rewards, optimal_percentage, regret
