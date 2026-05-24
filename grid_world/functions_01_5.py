@@ -276,15 +276,7 @@ def Q_learning(env, gamma, alpha, eps, s0, n_samples=200, T=100):
                 break
 
             # Update policy
-            Q_s = np.array([Q[(state, a)] for a in range(len(env.actions))])
-            max_Q_s = np.max(Q_s)
-            greedy_indices = np.where(Q_s >= max_Q_s - 1e-12)[0]
-            n_greedy = len(greedy_indices)
-            # base exploration probability
-            pi[state][:] = eps / len(env.actions)
-            # add exploitation mass to greedy actions
-            for a in greedy_indices:
-                pi[state][a] += (1.0 - eps) / n_greedy
+            pi = compute_eps_greedy_policy(env, Q, eps)
             
             state = next_state
 
