@@ -268,13 +268,13 @@ def Q_learning(env, gamma, alpha, eps, s0, n_samples=200, T=100):
             next_state = env.step(state, action)
             # Reward received from transition
             reward = env.reward(next_state, state, action)
-            # Check if next state is terminal
-            if next_state == env.battery_pos:
-                Q[state, action] += alpha*(reward - Q[state, action])
-                break
             # Update value estimate using temporal differences
             Q[state, action] += alpha*(reward + gamma*max(Q[next_state, a] for a in range(len(env.actions))) - Q[state, action])
             
+            # Check if next state is terminal
+            if next_state == env.battery_pos:
+                break
+
             # Update policy
             Q_s = np.array([Q[(state, a)] for a in range(len(env.actions))])
             max_Q_s = np.max(Q_s)
