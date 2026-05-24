@@ -57,6 +57,13 @@ class GridWorld:
         Returns the probability of transitioning from state to successor
         using the given action.
         '''
+
+        if state == self.battery_pos:
+            if successor == state:
+                return 1.0
+            else:
+                return 0.0
+
         if(self.actions[action] == 'Down'):
             if (state[0]+1, state[1]) == successor and (state[0]+1, state[1]) in self.states():
                 return 1.0
