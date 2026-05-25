@@ -14,23 +14,47 @@ V = {(0, 0) : 0.4, (0, 1) : 0.5, (0, 2) : 0.6, (0, 3) : 0.7, (1, 0) : 0.5, (1, 3
 
 down = [1.0, 0.0, 0.0, 0.0]
 down_right = [0.5, 0.0, 0.0, 0.5]
-    
+
 pi_dr = {s : down_right for s in env.states()}
 pi_d = {s : down for s in env.states()}
 
 gam_0_9 = 0.9
 gam_0_1 = 0.1
 
+V_start = []
+
+pi_optimal = {(0, 0) : [1.0, 0.0, 0.0, 0.0], 
+        (1, 0) : [1.0, 0.0, 0.0, 0.0], 
+        (2, 0) : [1.0, 0.0, 0.0, 0.0], 
+        (3, 0) : [0.0, 0.0, 0.0, 1.0],
+        (3, 1) : [0.0, 0.0, 0.0, 1.0],
+        (3, 2) : [0.0, 0.0, 0.0, 1.0],
+        (3, 3) : [0.0, 0.0, 0.0, 1.0],
+        # Der Rest der Zustände ist egal, da sie nicht erreicht werden können
+        (0, 1) : [0.0, 0.0, 0.0, 1.0],
+        (0, 2) : [0.0, 0.0, 0.0, 1.0],
+        (0, 3) : [0.0, 0.0, 0.0, 1.0],
+        (1, 1) : [0.0, 0.0, 0.0, 1.0],
+        (1, 2) : [0.0, 0.0, 0.0, 1.0],
+        (1, 3) : [0.0, 0.0, 0.0, 1.0],
+        (2, 1) : [0.0, 0.0, 0.0, 1.0],
+        (2, 2) : [0.0, 0.0, 0.0, 1.0],
+        (2, 3) : [0.0, 0.0, 0.0, 1.0]
+        }
+
 V_pi_dr_gam_0_9 = solve_Bellman_expectation(env, pi_dr, gam_0_9)
 V_pi_dr_gam_0_1 = solve_Bellman_expectation(env, pi_dr, gam_0_1)
 V_pi_d_gam_0_9 = solve_Bellman_expectation(env, pi_d, gam_0_9)
+V_pi_optimal_gam_0_9 = solve_Bellman_expectation(env, pi_optimal, gam_0_9)
 
 plot_V(env, V_pi_dr_gam_0_9)
 plot_V(env, V_pi_dr_gam_0_1)
 plot_V(env, V_pi_d_gam_0_9)
+plot_V(env, V_pi_optimal_gam_0_9)
 
 V_ipe_0_9, dist_ipe_0_9 = iterative_policy_evaluation(env, pi_dr, gam_0_9, V_true=V_pi_dr_gam_0_9)
 V_ipe_0_1, dist_ipe_0_1 = iterative_policy_evaluation(env, pi_dr, gam_0_1, V_true=V_pi_dr_gam_0_1)
+V_ipe_0_9_opt, dist_ipe_0_9_opt = iterative_policy_evaluation(env, pi_optimal, gam_0_9, V_true=V_pi_optimal_gam_0_9)
         
 # Plot with shaded variance
 plt.figure(figsize=(8,5))
@@ -51,6 +75,7 @@ plt.rcParams.update({
 
 plt.plot(dist_ipe_0_9, label='Iterative policy evaluation, $\gamma = 0.9$', color='orange')
 plt.plot(dist_ipe_0_1, label='Iterative policy evaluation, $\gamma = 0.1$', color='blue')
+plt.plot(dist_ipe_0_9_opt, label='Iterative policy evaluation, optimal policy', color='green')
     
 plt.yscale('log')
 plt.xlabel(r'Number of iterations')
